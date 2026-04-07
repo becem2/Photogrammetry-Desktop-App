@@ -24,13 +24,13 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
     };
 
     return (
-        <div className="w-full max-w-md bg-white rounded-lg p-8 shadow-lg">
+        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left">
             {/* Back Button */}
             <div className="flex justify-start mb-5">
                 <button 
                     type="button"
                     onClick={(e) => { e.preventDefault(); onBack(); }} 
-                    className="text-gray-500 text-sm flex items-center gap-2 transition-colors hover:text-gray-900 cursor-pointer"
+                    className="text-gray-500 text-sm flex items-center gap-2 transition-colors hover:text-gray-900 cursor-pointer border-none bg-transparent p-0"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -48,19 +48,19 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                 </div>
 
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Reset Password</h1>
-                <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-sm">
+                <p className="text-sm text-gray-500 mb-6">
                     Enter your email address and we'll send you instructions to reset your password
                 </p>
 
                 {/* Email Input Field */}
                 <div className="w-full text-left mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                    <div className="flex items-center border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 transition-all focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-inset focus-within:ring-emerald-600">
-                        <Mail size={20} className="mr-3 text-gray-400 opacity-50" />
+                    <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-white transition-all duration-200 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:ring-inset">
+                        <Mail size={20} className="mr-3 text-gray-400" />
                         <input 
                             type="email" 
                             placeholder="you@example.com" 
-                            className="border-none outline-none flex-1 text-sm bg-transparent text-gray-900 placeholder-gray-400"
+                            className="border-none outline-none flex-1 text-sm text-gray-900"
                             value={email}
                             onChange={handleEmailChange}
                         />
@@ -71,13 +71,13 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                 <button 
                     onClick={handleSubmit}
                     disabled={!isValidEmail}
-                    className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg border-none cursor-pointer transition-colors mb-8 hover:bg-emerald-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg border-none cursor-pointer transition-colors hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                     Send Reset Instructions
                 </button>
 
                 {/* Help Footer Box */}
-                <div className="w-full bg-gray-100 rounded-lg p-4">
+                <div className="w-full bg-gray-100 rounded-lg p-4 mt-6">
                     <p className="m-0 text-sm text-gray-600 font-medium">
                         Need help? Contact support at{' '}
                         <a href="mailto:support@dronemeshpro.com" className="text-emerald-600 no-underline font-medium hover:underline">
@@ -86,6 +86,8 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                     </p>
                 </div>
             </div>
+
+            <p className="text-xs text-gray-400 text-center mt-7">© 2026 DroneMesh Pro. All rights reserved.</p>
         </div>
     );
 }

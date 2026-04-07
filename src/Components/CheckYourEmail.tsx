@@ -14,13 +14,13 @@ function CheckYourEmailCard({
 }: CheckYourEmailCardProps) {
 
     return (
-        <div className="w-full max-w-md bg-white rounded-lg p-8 shadow-lg">
+        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left">
             {/* Back Button */}
             <div className="flex justify-start mb-5 hover:cursor-pointer">
                 <button
                     type="button"
                     onClick={onBackToLogin}
-                    className="text-gray-500 text-sm flex items-center gap-2 transition-colors hover:text-gray-900 "
+                    className="text-gray-500 text-sm flex items-center gap-2 transition-colors hover:text-gray-900 border-none bg-transparent p-0 cursor-pointer"
                 >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
@@ -43,13 +43,13 @@ function CheckYourEmailCard({
                 </div>
 
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
-                <p className="text-sm text-gray-500 leading-relaxed mb-2 max-w-sm">
+                <p className="text-sm text-gray-500 mb-2">
                     We've sent password reset instructions to
                 </p>
                 
                 <p className="text-sm text-emerald-600 font-semibold mb-4">{email}</p>
                 
-                <p className="text-sm text-gray-500 leading-relaxed mb-8 max-w-sm">
+                <p className="text-sm text-gray-500 mb-6">
                     If you don't see the email, check your spam folder or try again with a different email address.
                 </p>
 
@@ -57,11 +57,13 @@ function CheckYourEmailCard({
                 <button 
                     type="button" 
                     onClick={onTryDifferentEmail}
-                    className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg border-none cursor-pointer transition-colors mb-8 hover:bg-emerald-700"
+                    className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-lg border-none cursor-pointer transition-colors hover:bg-emerald-700"
                 >
                     Try Different Email
                 </button>
             </div>
+
+            <p className="text-xs text-gray-400 text-center mt-7">© 2026 DroneMesh Pro. All rights reserved.</p>
         </div>
     );
 }
