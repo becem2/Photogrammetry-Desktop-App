@@ -29,7 +29,7 @@ function LogInCard({ onSignUp, onForgot }: LogInCardProps) {
     }
 
     return (
-        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left">
+        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left border border-gray-300">
             
             <h1 className="text-2xl font-bold mb-2 text-gray-900">Welcome back</h1>
             

@@ -39,7 +39,7 @@ function EmailVerification({ onBack, onVerify, email }: { onBack: () => void, on
     };
 
     return (
-        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left">
+        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left border border-gray-300">
             <button 
                 onClick={onBack}
                 className="flex items-center text-gray-500 hover:text-emerald-600 transition-colors mb-6 border-none bg-transparent cursor-pointer p-0 text-sm font-medium"

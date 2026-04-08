@@ -24,7 +24,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
     };
 
     return (
-        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left">
+        <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left border border-gray-300">
             {/* Back Button */}
             <div className="flex justify-start mb-5">
                 <button 
