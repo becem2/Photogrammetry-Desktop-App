@@ -126,7 +126,7 @@ function SignUpOptionsCard({ onSwitch, onSignUpSuccess }: SignUpOptionsCardProps
 
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-semibold text-gray-700">Confirm Password</label>
-                    <div className={`flex items-center border rounded-lg px-3 py-2 bg-white transition-all duration-200 ${password !== confirmPassword && confirmPassword ? 'border-red-500' : 'border-gray-300 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:ring-inset'}`}>
+                    <div className={`flex items-center border rounded-lg px-3 py-2 bg-white transition-all duration-200 ${password !== confirmPassword && confirmPassword ? 'border-red-600 focus-within:border-red-600 focus-within:ring-3 focus-within:ring-red-600 focus-within:ring-inset' : 'border-gray-300 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:ring-inset'}`}>
                         <Lock size={20} className="mr-3 text-gray-400" />
                         <input
                             type={showConfirmPassword ? "text" : "password"}
