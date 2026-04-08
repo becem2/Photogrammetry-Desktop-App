@@ -29,8 +29,8 @@ function Dashboard({ user, onLogout }: DashboardProps) {
 
                     <div className="rounded-3xl border border-gray-200 p-8 bg-slate-50">
                         <p className="text-gray-700 text-base">
-                            Your secure dashboard is now displayed without client-side routing.
-                            This view is only reachable when Firebase confirms a signed-in user.
+                            Your secure dashboard is still in developpement, if you would be patient we will 
+                            continue to devlop it sometimes this year (hopefully) !!!
                         </p>
                     </div>
                 </div>

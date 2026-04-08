@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { Mail, Eye, EyeOff, Lock } from 'lucide-react';
 
 import Button from "./SocialLogInButtons";
-import { createUserWithEmailAndPassword, signInWithPopup, User, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
 import { auth, googleProvider, facebookProvider, githubProvider, appleProvider } from "../Config/Firebase";
 
 interface SignUpOptionsCardProps {
@@ -29,7 +29,6 @@ function SignUpOptionsCard({ onSwitch, onSignUpSuccess }: SignUpOptionsCardProps
         }
         try {
             const result = await createUserWithEmailAndPassword(auth, email, password);
-            await sendEmailVerification(result.user);
             onSignUpSuccess(result.user);
         } catch (error) {
             console.log((error as Error).message);

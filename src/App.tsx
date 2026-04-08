@@ -1,37 +1,41 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
-import { auth } from "./Config/Firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "./Config/Firebase";
 import LogInSignUp from "./Views/LogIn";
 import Dashboard from "./Views/Dashboard";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [authLoaded, setAuthLoaded] = useState(false);
+  const [userDataLoaded, setUserDataLoaded] = useState(false);
+  const [hasUserData, setHasUserData] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
-      setAuthLoaded(true);
+      if (user) {
+        const userDoc = await getDoc(doc(db, "Users", user.uid));
+        setHasUserData(userDoc.exists());
+      } else {
+        setHasUserData(false);
+      }
+      setUserDataLoaded(true);
     });
 
     return unsubscribe;
   }, []);
 
-  const isAuthenticated = Boolean(
-    currentUser &&
-      (currentUser.emailVerified ||
-        currentUser.providerData.some((provider) => provider.providerId !== "password"))
-  );
+  const isAuthenticated = Boolean(currentUser && hasUserData);
 
-  if (!authLoaded) {
+  if (!userDataLoaded) {
     return null;
   }
 
   return isAuthenticated ? (
     <Dashboard user={currentUser} onLogout={() => signOut(auth)} />
   ) : (
-    <LogInSignUp />
+    <LogInSignUp onUserDataComplete={() => setHasUserData(true)} />
   );
 }
 

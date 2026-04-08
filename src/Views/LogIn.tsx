@@ -4,16 +4,17 @@ import SignUpOptionsCard from "../Components/SignUpOptionsCard";
 import AdditionalInfoCard from "../Components/AdditionalInfoCard";
 import ForgetPasswordCard from "../Components/ForgerPasswordCard";
 import CheckYourEmailCard from "../Components/CheckYourEmail";
-import EmailVerification from "../Components/EmailVerificationCard";
 import LeftSide from "../Components/LeftSide";
 import { User } from "firebase/auth";
-import { auth } from "../Config/Firebase";
 
-function LogInSignUp() {
+interface LogInSignUpProps {
+    onUserDataComplete: () => void;
+}
+
+function LogInSignUp({ onUserDataComplete }: LogInSignUpProps) {
     const [isLogIn, setIsLogIn] = useState(true);
     const [isForgetPassword, setIsForgetPassword] = useState(false);
     const [isCheckYourEmail, setIsCheckYourEmail] = useState(false);
-    const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
     const [isAdditionalInfo, setIsAdditionalInfo] = useState(false);
     const [submittedEmail, setSubmittedEmail] = useState("");
     const [currentUserUid, setCurrentUserUid] = useState("");
@@ -34,30 +35,13 @@ function LogInSignUp() {
     const handleBackToLogin = () => {
         setIsCheckYourEmail(false);
         setIsForgetPassword(false);
-        setIsVerifyingEmail(false);
         setIsLogIn(true);
     };
 
     const handleSignUpSuccess = (user: User) => {
-        if (user.emailVerified) {
-            setCurrentUserUid(user.uid);
-            setCurrentUserEmail(user.email || "");
-            setIsAdditionalInfo(true);
-        } else {
-            setSubmittedEmail(user.email || "");
-            setIsVerifyingEmail(true);
-        }
-    };
-
-    const handleVerificationComplete = (code: string) => {
-        console.log("Verifying code:", code);
-        setIsVerifyingEmail(false);
-        const user = auth.currentUser;
-        if (user) {
-            setCurrentUserUid(user.uid);
-            setCurrentUserEmail(user.email || "");
-            setIsAdditionalInfo(true);
-        }
+        setCurrentUserUid(user.uid);
+        setCurrentUserEmail(user.email || "");
+        setIsAdditionalInfo(true);
     };
 
     return (
@@ -84,17 +68,15 @@ function LogInSignUp() {
                             onForgot={() => setIsForgetPassword(true)}
                         />
                     )
-                ) : isVerifyingEmail ? (
-                    <EmailVerification 
-                        email={submittedEmail} 
-                        onBack={() => setIsVerifyingEmail(false)} 
-                        onVerify={handleVerificationComplete}
-                    />
                 ) : isAdditionalInfo ? (
                     <AdditionalInfoCard 
                         uid={currentUserUid} 
                         email={currentUserEmail} 
-                        onComplete={() => { setIsAdditionalInfo(false); setIsLogIn(true); }}
+                        onComplete={() => { 
+                            setIsAdditionalInfo(false); 
+                            setIsLogIn(true); 
+                            onUserDataComplete();
+                        }}
                     />
                 ) : (
                     <SignUpOptionsCard 
