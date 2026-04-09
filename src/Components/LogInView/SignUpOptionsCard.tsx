@@ -3,7 +3,7 @@ import { Mail, Eye, EyeOff, Lock } from 'lucide-react';
 
 import Button from "./SocialLogInButtons";
 import { createUserWithEmailAndPassword, signInWithPopup, User } from "firebase/auth";
-import { auth, googleProvider, facebookProvider, githubProvider, appleProvider } from "../Config/Firebase";
+import { auth, googleProvider, facebookProvider, githubProvider, appleProvider } from "../../Config/Firebase";
 
 interface SignUpOptionsCardProps {
     onSwitch: () => void;

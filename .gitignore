@@ -16,6 +16,7 @@ release/
 .env
 .env.*
 !.env.example
+.github/
 
 # Editor directories and files
 .vscode/*

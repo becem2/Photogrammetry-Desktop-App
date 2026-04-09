@@ -1,10 +1,10 @@
 import { useState } from "react";
-import LogInCard from "../Components/LogInCard";
-import SignUpOptionsCard from "../Components/SignUpOptionsCard";
-import AdditionalInfoCard from "../Components/AdditionalInfoCard";
-import ForgetPasswordCard from "../Components/ForgerPasswordCard";
-import CheckYourEmailCard from "../Components/CheckYourEmail";
-import LeftSide from "../Components/LeftSide";
+import LogInCard from "../Components/LogInView/LogInCard";
+import SignUpOptionsCard from "../Components/LogInView/SignUpOptionsCard";
+import AdditionalInfoCard from "../Components/LogInView/AdditionalInfoCard";
+import ForgetPasswordCard from "../Components/LogInView/ForgerPasswordCard";
+import CheckYourEmailCard from "../Components/LogInView/CheckYourEmail";
+import LeftSide from "../Components/LogInView/LeftSide";
 import { User } from "firebase/auth";
 
 interface LogInSignUpProps {
@@ -45,7 +45,7 @@ function LogInSignUp({ onUserDataComplete }: LogInSignUpProps) {
     };
 
     return (
-        <div className="flex flex-row min-h-screen w-screen m-0 p-0">
+        <div className="flex flex-row h-screen flex-1 w-fill m-0 p-0">
             <div className="bg-blue-600 flex-1 flex items-center justify-center">
                 <LeftSide />
             </div>

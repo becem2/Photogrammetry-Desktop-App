@@ -3,7 +3,7 @@ import { Mail, Eye, EyeOff, Lock } from 'lucide-react';
 
 import Button from "./SocialLogInButtons";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../Config/Firebase";
+import { auth } from "../../Config/Firebase";
 
 interface LogInCardProps {
     onSignUp: () => void;

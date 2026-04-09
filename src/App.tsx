@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { onAuthStateChanged, signOut, type User } from "firebase/auth";
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./Config/Firebase";
-import LogInSignUp from "./Views/LogIn";
-import Dashboard from "./Views/Dashboard";
+
+// Hiarchy Components
+import LogInSignUp from "./Views/LogInView";
+import Layout from "./Views/Workspace";
+import TopNavBar from "./Views/TopNabBar";
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -32,10 +35,11 @@ function App() {
     return null;
   }
 
-  return isAuthenticated ? (
-    <Dashboard user={currentUser} onLogout={() => signOut(auth)} />
-  ) : (
-    <LogInSignUp onUserDataComplete={() => setHasUserData(true)} />
+  return (
+    <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <TopNavBar/>
+      {isAuthenticated ? (<Layout />) : (<LogInSignUp onUserDataComplete={() => setHasUserData(true)} />)}
+    </div>
   );
 }
 

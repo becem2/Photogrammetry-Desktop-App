@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Eye, EyeOff, Mail, Lock, User, Building2 } from 'lucide-react';
 
 import Button from "./SocialLogInButtons";
-import { auth, facebookProvider, githubProvider, googleProvider, db } from '../Config/Firebase'
+import { auth, facebookProvider, githubProvider, googleProvider, db } from '../../Config/Firebase'
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { setDoc, doc } from "firebase/firestore";
 

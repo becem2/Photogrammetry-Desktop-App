@@ -1,9 +1,14 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 // Resolve __dirname for ESM
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Force a writable userData path on Windows to avoid cache access issues
+app.setPath('userData', path.join(app.getPath('appData'), 'DroneMeshPro'));
+app.commandLine.appendSwitch('disable-features', 'AutofillServerCommunication');
+app.commandLine.appendSwitch('disable-blink-features', 'ResizeObserver');
 
 // Set app root
 process.env.APP_ROOT = path.join(__dirname, '..');
@@ -22,16 +27,12 @@ let win: BrowserWindow | null = null;
 function createWindow() {
   win = new BrowserWindow({
     width: 1280,
-    height: 720,
+    height: 800,
     minWidth: 1280,
-    minHeight: 720,
+    minHeight: 800,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      height: 32,
-      color: 'green',
-      symbolColor: '#f8fafc',
-    },
+    show: false,
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
@@ -50,6 +51,11 @@ function createWindow() {
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
+
+  // Show window after content is loaded
+  win.once('ready-to-show', () => {
+    win?.show();
+  });
 
   // Open DevTools only in development mode
   const isDev = !!VITE_DEV_SERVER_URL || !app.isPackaged;
@@ -75,3 +81,26 @@ app.on('activate', () => {
 
 // Create the main window
 app.whenReady().then(createWindow);
+
+// IPC Handlers for window controls
+ipcMain.on('window-minimize', () => {
+  if (win) {
+    win.minimize();
+  }
+});
+
+ipcMain.on('window-maximize', () => {
+  if (win) {
+    if (win.isMaximized()) {
+      win.unmaximize();
+    } else {
+      win.maximize();
+    }
+  }
+});
+
+ipcMain.on('window-close', () => {
+  if (win) {
+    win.close();
+  }
+});

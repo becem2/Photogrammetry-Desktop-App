@@ -1,7 +1,7 @@
 import { useState, FormEvent } from "react";
 import { User, Building2, Phone, Briefcase } from 'lucide-react';
 import { doc, setDoc } from "firebase/firestore";
-import { db } from "../Config/Firebase";
+import { db } from "../../Config/Firebase";
 
 interface AdditionalInfoCardProps {
     uid: string;
