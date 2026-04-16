@@ -109,11 +109,11 @@ function LogInSignUp({ onUserDataComplete, pendingProfileUser = null }: LogInSig
     };
 
     return (
-        <div className="flex flex-row h-screen flex-1 w-fill m-0 p-0">
-            <div className="bg-blue-600 flex-1 flex items-center justify-center">
+        <div className="flex h-screen w-full m-0 p-0">
+            <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-center">
                 <LeftSide />
             </div>
-            <div className="bg-white flex-1 flex items-center justify-center">
+            <div className="bg-white flex-1 flex items-center justify-center p-4 md:p-8">
                 {isLogIn ? (
                     isCheckYourEmail ? (
                         <CheckYourEmailCard
