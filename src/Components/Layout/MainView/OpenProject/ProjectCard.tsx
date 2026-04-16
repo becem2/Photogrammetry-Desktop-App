@@ -7,6 +7,7 @@ interface ProjectCardProps {
   onOpen: () => void;
 }
 
+// Compact picker card used in the Open Project screen.
 function ProjectCard({ project, onOpen }: ProjectCardProps) {
   const getStatusIcon = (status: UserProject["status"]) => {
     switch (status) {

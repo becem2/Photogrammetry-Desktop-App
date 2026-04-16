@@ -6,6 +6,7 @@ interface TopNavBarProps {
 
 function TopNavBar({ isProfileCompletionRequired = false }: TopNavBarProps) {
   const handleMinimize = () => {
+    // Forward window control to Electron.
     window.electronAPI?.minimize();
   };
 
@@ -15,6 +16,7 @@ function TopNavBar({ isProfileCompletionRequired = false }: TopNavBarProps) {
 
   const handleClose = () => {
     if (isProfileCompletionRequired) {
+      // Prevent closing while the profile-completion flow is still required.
       window.alert("Please complete and save your profile information before closing the app.");
       return;
     }

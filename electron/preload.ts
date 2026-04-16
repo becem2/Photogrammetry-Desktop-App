@@ -1,23 +1,28 @@
 import { ipcRenderer, contextBridge } from "electron";
 
+// Safe bridge exposed to the renderer.
+// Keep the API surface narrow so the UI can only call approved IPC methods.
 // ==============================
 // 🌉 Electron API (SAFE BRIDGE)
 // ==============================
 
 const electronAPI = {
   // ==============================
-  // 📁 FILE SYSTEM
+  // 📁 FILE SYSTEM & PROJECTS
   // ==============================
 
   readDirectory: (dirPath: string) => {
+    // Ask the main process to inspect a directory.
     return ipcRenderer.invoke("read-directory", dirPath);
   },
 
   selectFolder: () => {
+    // Open the native folder picker.
     return ipcRenderer.invoke("select-folder");
   },
 
   selectImages: () => {
+    // Open the native image picker.
     return ipcRenderer.invoke("select-images");
   },
 
@@ -28,10 +33,12 @@ const electronAPI = {
     description: string;
     images: Array<{ path: string; name: string; size: number }>;
   }) => {
+    // Delegate project folder creation and file copying to the main process.
     return ipcRenderer.invoke("create-project", payload);
   },
 
   getSystemStats: () => {
+    // Fetch the latest system metrics snapshot.
     return ipcRenderer.invoke("get-system-stats");
   },
 
@@ -52,7 +59,7 @@ const electronAPI = {
   },
 
   // ==============================
-  // 🪟 NATIVE EXPLORER
+  // 🌐 EXTERNAL & SHELL
   // ==============================
 
   openExplorer: (folderPath: string) => {
@@ -63,32 +70,10 @@ const electronAPI = {
     return ipcRenderer.invoke("trash-project-folder", folderPath);
   },
 
-  getOdmTaskState: (projectId: string) => {
-    return ipcRenderer.invoke("get-odm-task-state", projectId);
-  },
-
   signInWithGoogleExternal: () => {
     return ipcRenderer.invoke("sign-in-google-external");
   },
-
-  // ==============================
-  // 📡 MAIN PROCESS EVENTS
-  // ==============================
-
-  onMainMessage: (callback: (data: any) => void) => {
-    const listener = (_event: any, data: any) => callback(data);
-
-    ipcRenderer.on("main-process-message", listener);
-
-    // cleanup function (VERY IMPORTANT)
-    return () => {
-      ipcRenderer.removeListener("main-process-message", listener);
-    };
-  },
 };
 
-// ==============================
-// 🔐 EXPOSE TO RENDERER
-// ==============================
-
+// Publish the safe API on window.electronAPI.
 contextBridge.exposeInMainWorld("electronAPI", electronAPI);

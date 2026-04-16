@@ -16,6 +16,7 @@ interface SignUpOptionsCardProps {
     onSignUpSuccess: (user: User) => void;
 }
 
+// Alternate sign-up screen that supports email/password and social providers.
 function SignUpOptionsCard({ onSwitch, onSignUpSuccess }: SignUpOptionsCardProps) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -43,6 +44,7 @@ function SignUpOptionsCard({ onSwitch, onSignUpSuccess }: SignUpOptionsCardProps
 
     const signInWithGoogle = async () => {
         try {
+            // Use the external Electron flow so Google OAuth can complete outside the webview.
             const googleAuthResult = await window.electronAPI.signInWithGoogleExternal();
             const googleCredential = GoogleAuthProvider.credential(
                 googleAuthResult.idToken,

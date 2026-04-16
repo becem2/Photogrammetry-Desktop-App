@@ -5,13 +5,16 @@ import { Search, FolderOpen } from "lucide-react";
 import { type UserProject, useUserProjects } from "../../../hooks/useUserProjects";
 import ProjectCard from "./OpenProject/ProjectCard";
 
+// Convert project status into the filter value used by the dropdown.
 const statusToFilterValue = (status: UserProject["status"]) =>
   status.toLowerCase().replace(/\s+/g, "-");
 
+// Choose the route a project should open in based on its status.
 const getProjectOpenPath = (project: UserProject) =>
   project.status === "Processed" ? `/viewer/${project.id}` : `/processing/${project.id}`;
 
 function OpenProject() {
+  // Browse existing projects and jump directly into viewing or processing.
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");

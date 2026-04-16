@@ -9,6 +9,7 @@ import SettingRow from "./Settings/SettingRow";
 import ToggleControl from "./Settings/ToggleControl";
 import TextInput from "./Settings/TextInput";
 
+// Settings tabs and the user-facing appearance presets.
 type AppearanceMode = "light" | "dark";
 type AccentTheme = "emerald" | "blue" | "amber";
 type SettingsTab = "account" | "general" | "processing" | "appearance";
@@ -36,6 +37,7 @@ const defaultSettings = {
 };
 
 const applyAppearanceSettings = (mode: AppearanceMode, accentTheme: AccentTheme) => {
+  // Keep the document theme variables aligned with the chosen accent.
   const accentConfig = accentThemeConfig[accentTheme];
 
   document.documentElement.classList.toggle("dark", mode === "dark");
@@ -53,6 +55,7 @@ const sanitizeAccentTheme = (value: unknown): AccentTheme => {
 };
 
 function Settings() {
+  // Load, edit, and persist user preferences for the signed-in account.
   const user = auth.currentUser;
   const [activeTab, setActiveTab] = useState<SettingsTab>("account");
   const [fullName, setFullName] = useState(user?.displayName || "");
@@ -68,6 +71,7 @@ function Settings() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    // Hydrate the form from Firestore when a profile is available.
     if (!user?.uid) {
       setFullName("");
       return;
@@ -145,6 +149,7 @@ function Settings() {
   };
 
   const handleSaveSettings = async () => {
+    // Persist the current form state back to the user document.
     if (!user?.uid) return;
 
     try {

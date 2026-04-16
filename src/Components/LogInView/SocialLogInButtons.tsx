@@ -12,7 +12,7 @@ interface ButtonProps {
 }
 
 function Button({ text, onClick }: ButtonProps) {
-    // Create simple custom icons for social media
+    // Map the button label to the matching provider icon.
     const getIcon = (iconName: string) => {
         switch (iconName) {
             case 'Google':

@@ -4,6 +4,7 @@ import { AlertCircle, Calendar, Clock, Image as ImageIcon, MapPin, Play, Trendin
 import { type UserProject } from "../../../../hooks/useUserProjects";
 import ProjectMenu from "./ProjectMenu";
 
+// List-row variant used when the Projects page switches to compact mode.
 const getProjectOpenPath = (project: UserProject) =>
   project.status === "Processed" ? `/viewer/${project.id}` : `/processing/${project.id}`;
 

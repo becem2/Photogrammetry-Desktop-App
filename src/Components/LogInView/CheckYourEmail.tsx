@@ -1,6 +1,4 @@
-
-
-// Types for the props to control navigation from outside
+// Confirmation screen shown after requesting a password reset email.
 interface CheckYourEmailCardProps {
     email: string;
     onBackToLogin: () => void;
@@ -15,7 +13,7 @@ function CheckYourEmailCard({
 
     return (
         <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left border border-gray-300">
-            {/* Back Button */}
+            {/* Return to the login flow. */}
             <div className="flex justify-start mb-5 hover:cursor-pointer">
                 <button
                     type="button"
@@ -30,9 +28,9 @@ function CheckYourEmailCard({
                 </button>
             </div>
 
-            {/* Main Content */}
+            {/* Message and primary action. */}
             <div className="flex flex-col items-center text-center">
-                {/* Success Icon Box */}
+                {/* Success badge. */}
                 <div className="bg-emerald-100 w-16 h-16 rounded-lg flex justify-center items-center mb-6">
                     <div className="relative w-12 h-12 flex items-center justify-center">
                         <svg viewBox="0 0 52 52" className="absolute w-full h-full text-emerald-600" fill="none">
@@ -53,7 +51,7 @@ function CheckYourEmailCard({
                     If you don't see the email, check your spam folder or try again with a different email address.
                 </p>
 
-                {/* Primary Action Button */}
+                {/* Switch to a different email if needed. */}
                 <button 
                     type="button" 
                     onClick={onTryDifferentEmail}

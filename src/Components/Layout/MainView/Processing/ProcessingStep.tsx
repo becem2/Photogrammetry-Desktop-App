@@ -1,6 +1,7 @@
 import { CheckCircle2, Loader2 } from "lucide-react";
 import * as Progress from "@radix-ui/react-progress";
 
+// One step in the staged processing timeline.
 type ProcessingStepData = {
   id: number;
   name: string;

@@ -6,6 +6,7 @@ import { collection, doc, getDocs, limit, query, serverTimestamp, updateDoc, whe
 import { auth, db } from "../../../Config/Firebase";
 import ProcessingStep from "./Processing/ProcessingStep";
 
+// Ordered milestones shown in the processing workflow.
 const processingSteps = [
   {
     id: 1,
@@ -48,6 +49,7 @@ type ProjectPayload = {
 };
 
 const getProcessingStepByProgress = (progress: number) => {
+  // Map overall percentage to a visible step highlight.
   if (progress >= 80) return 4;
   if (progress >= 55) return 3;
   if (progress >= 25) return 2;
@@ -56,12 +58,14 @@ const getProcessingStepByProgress = (progress: number) => {
 };
 
 const formatLogMessage = (message: string) => {
+  // Prefix logs with a local timestamp for easier debugging.
   const now = new Date();
   const timestamp = now.toLocaleTimeString("en-GB", { hour12: false });
   return `[${timestamp}] ${message}`;
 };
 
 function Processing() {
+  // Track the active project's simulated processing state and log stream.
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingProject, setIsLoadingProject] = useState(true);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -96,13 +100,6 @@ function Processing() {
     });
   }, []);
 
-  const appendRawLog = useCallback((message: string) => {
-    setConsoleLogs((existingLogs) => {
-      const nextLogs = [...existingLogs, message];
-      return nextLogs.slice(-120);
-    });
-  }, []);
-
   const updateProjectDoc = useCallback(
     async (payload: Record<string, unknown>) => {
       const currentUser = auth.currentUser;
@@ -119,6 +116,7 @@ function Processing() {
   );
 
   useEffect(() => {
+    // Load the project record first, then decide whether to finish or simulate progress.
     const loadProjectAndMaybeStart = async () => {
       if (!activeProjectId) {
         setIsLoadingProject(false);
@@ -159,30 +157,24 @@ function Processing() {
             : 0;
         setCurrentProgress(existingProgress);
 
-        const odmState = await window.electronAPI.getOdmTaskState(activeProjectId);
-
-        if (odmState.logs.length > 0) {
-          setConsoleLogs(odmState.logs.slice(-120));
-        }
-
-        if (odmState.status === "running") {
-          setIsProcessing(true);
-          setStatusLabel("Processing");
-        } else if (odmState.status === "completed") {
+        const normalizedStatus = projectData.status?.trim().toLowerCase();
+        if (normalizedStatus === "processed" || existingProgress >= 100) {
           setIsProcessing(false);
           setStatusLabel("Completed");
           setCurrentProgress(100);
-        } else if (odmState.status === "failed") {
+          return;
+        }
+
+        if (normalizedStatus === "failed") {
           setIsProcessing(false);
           setStatusLabel("Failed");
-        } else if (projectData.status?.trim().toLowerCase() !== "processed") {
-          setIsProcessing(false);
-          setStatusLabel("Waiting for ODMConsole");
-          appendLog("Waiting for ODMConsole logs...");
-        } else {
-          setStatusLabel("Completed");
-          setIsProcessing(false);
+          appendLog("Processing failed.");
+          return;
         }
+
+        setIsProcessing(true);
+        setStatusLabel("Processing");
+        appendLog("Processing started.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "Failed to load project.";
         setErrorMessage(message);
@@ -200,67 +192,35 @@ function Processing() {
   }, [activeProjectId, appendLog, clearProcessingTimer, state?.imageCount, state?.projectName]);
 
   useEffect(() => {
-    if (!activeProjectId) return;
+    // Simulate incremental progress for projects that are still in flight.
+    if (!isProcessing || currentProgress >= 100) {
+      clearProcessingTimer();
+      return;
+    }
 
-    const unsubscribe = window.electronAPI.onMainMessage((data: unknown) => {
-      if (!data || typeof data !== "object") {
-        return;
-      }
-
-      const payload = data as {
-        type?: string;
-        projectId?: string;
-        message?: string;
-        status?: "idle" | "running" | "completed" | "failed";
-        exitCode?: number | null;
-      };
-
-      if (payload.projectId !== activeProjectId) {
-        return;
-      }
-
-      if (payload.type === "odm-log" && payload.message) {
-        appendRawLog(payload.message);
-
-        const percentageMatch = payload.message.match(/(\d{1,3})\s*%/);
-        if (percentageMatch) {
-          const value = Number.parseInt(percentageMatch[1], 10);
-          if (Number.isFinite(value)) {
-            setCurrentProgress(Math.min(100, Math.max(0, value)));
-          }
-        }
-      }
-
-      if (payload.type === "odm-status" && payload.status) {
-        if (payload.status === "running") {
-          setIsProcessing(true);
-          setStatusLabel("Processing");
-          return;
+    processingTimerRef.current = window.setInterval(() => {
+      setCurrentProgress((previousProgress) => {
+        if (previousProgress >= 100) {
+          return previousProgress;
         }
 
-        if (payload.status === "completed") {
+        const nextProgress = Math.min(100, previousProgress + 2);
+
+        if (nextProgress >= 100) {
+          clearProcessingTimer();
           setIsProcessing(false);
           setStatusLabel("Completed");
-          setCurrentProgress(100);
-          appendLog("ODMConsole processing completed.");
-          return;
+          appendLog("Processing completed.");
         }
 
-        if (payload.status === "failed") {
-          setIsProcessing(false);
-          setStatusLabel("Failed");
-          appendLog(`ODMConsole failed (exit code: ${payload.exitCode ?? "unknown"}).`);
-          return;
-        }
-
-        setIsProcessing(false);
-      }
-    });
+        return nextProgress;
+      });
+    }, 500);
 
     return () => {
-      unsubscribe();
+      clearProcessingTimer();
     };
-  }, [activeProjectId, appendLog, appendRawLog]);
+  }, [appendLog, clearProcessingTimer, isProcessing]);
 
   useEffect(() => {
     clearProcessingTimer();
@@ -376,7 +336,7 @@ function Processing() {
                 </button>
                 <div className="ml-2">
                   <p className="text-sm">{isProcessing ? "Processing..." : statusLabel}</p>
-                  <p className="text-xs text-muted-foreground">ODMConsole integration</p>
+                  <p className="text-xs text-muted-foreground">Local processing workflow</p>
                 </div>
               </div>
 
@@ -388,7 +348,7 @@ function Processing() {
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-base mb-4">Console Log</h2>
+            <h2 className="text-base mb-4">Activity Log</h2>
 
             <ScrollArea.Root className="h-64 rounded bg-[#0a0e14] border border-border">
               <ScrollArea.Viewport className="w-full h-full p-4">

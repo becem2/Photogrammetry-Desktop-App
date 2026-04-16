@@ -55,17 +55,9 @@ interface Window {
       | { movedToTrash: true }
       | { movedToTrash: false; reason: "not-found" }
     >
-    getOdmTaskState: (projectId: string) => Promise<{
-      status: "idle" | "running" | "completed" | "failed"
-      logs: string[]
-      startedAt?: number
-      endedAt?: number
-      exitCode?: number | null
-    }>
     signInWithGoogleExternal: () => Promise<{
       idToken: string
       accessToken?: string
     }>
-    onMainMessage: (callback: (data: any) => void) => () => void
   }
 }

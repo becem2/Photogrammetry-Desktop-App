@@ -2,7 +2,7 @@
   "name": "my-photogrammetry-app",
   "author": "Becem Mhamdi",
   "private": true,
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "module",
   "description": "This is a professional photogrammetry Software",
   "scripts": {

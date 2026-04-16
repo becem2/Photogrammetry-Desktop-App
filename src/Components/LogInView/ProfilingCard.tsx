@@ -1,6 +1,5 @@
 
-
-
+// Placeholder component reserved for profile completion content.
 function ProfilingCard(){
     return(
         <div>

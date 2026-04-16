@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+// One horizontal settings row with label, description, and control.
 interface SettingRowProps {
   label: string;
   description: string;

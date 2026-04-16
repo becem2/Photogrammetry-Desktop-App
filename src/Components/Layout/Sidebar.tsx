@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { Home, FolderOpen, Eye, Settings as SettingsIcon, type LucideIcon } from "lucide-react";
 
+// Route metadata used to render the compact icon sidebar.
 interface NavItem {
   path: string;
   label: string;
@@ -9,6 +10,7 @@ interface NavItem {
 }
 
 function Sidebar() {
+  // Highlight the active route and show tooltips for each destination.
   const location = useLocation();
 
   const navItems: NavItem[] = [

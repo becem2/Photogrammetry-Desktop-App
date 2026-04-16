@@ -13,23 +13,14 @@ import Processing from "../Components/Layout/MainView/Processing";
 function Layout() {
   return (
     <Router>
-      {/* MAIN WRAPPER: 
-        flex-col stacks the Workspace and StatusBar.
-        h-screen overflow-hidden prevents the body from scrolling.
-      */}
+      {/* App frame: route content above, status bar below. */}
       <div className="flex flex-col h-screen w-screen overflow-hidden bg-background">
-        
-        {/* WORKSPACE AREA: 
-          flex-1 makes this container grow to fill all available space 
-          above the status bar.
-        */}
+
+        {/* Middle band: sidebar on the left and the active screen on the right. */}
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
 
-          {/* CONTENT VIEW: 
-            overflow-auto ensures only the route content scrolls 
-            if it becomes too long.
-          */}
+          {/* Route outlet for dashboard, projects, viewer, settings, and forms. */}
           <main className="flex-1 overflow-auto bg-background">
             <Routes>
               <Route path="/" element={<Dashboard />} />

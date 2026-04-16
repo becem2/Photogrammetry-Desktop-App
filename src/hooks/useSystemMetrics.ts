@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+// Snapshot of the stats consumed by the status bar.
 export type SystemStats = {
   cpuUsage: number;
   gpuUsage: number;
@@ -19,6 +20,7 @@ const defaultStats: SystemStats = {
 };
 
 export function useSystemMetrics(pollInterval = 3000) {
+  // Poll the Electron main process for the latest CPU, GPU, and storage data.
   const [stats, setStats] = useState<SystemStats>(defaultStats);
 
   useEffect(() => {

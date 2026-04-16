@@ -5,6 +5,7 @@ import { deleteDoc, doc, getDoc, runTransaction, serverTimestamp, setDoc } from 
 import { auth, db } from "../../../Config/Firebase";
 import ToggleOption from "./NewProject/ToggleOption";
 
+// Full new-project wizard for naming, configuring, and saving image sets.
 type SelectedImage = {
   path: string;
   name: string;
@@ -15,7 +16,6 @@ const generateProjectId = () => {
   if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
     return crypto.randomUUID();
   }
-
   return `project-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 };
 
@@ -46,24 +46,24 @@ function NewProject() {
   const isProjectPathValid = resolvedProjectLocation.length > 0;
   const isDescriptionValid = description.trim().length > 0;
   const hasEnoughImages = selectedImageCount >= 5;
+  
   const isCreateFormValid =
     isProjectNameValid &&
     isProjectPathValid &&
     isDescriptionValid &&
     hasEnoughImages &&
     hasAtLeastOneOption;
+
   const shouldShowCreateErrorAnimation =
     (validationAttempted && !isCreateFormValid) || pathInvalid;
 
   useEffect(() => {
     const loadDefaultProjectLocation = async () => {
       const currentUser = auth.currentUser;
-
       if (!currentUser?.uid) {
         setDefaultProjectLocation("");
         return;
       }
-
       try {
         const userDoc = await getDoc(doc(db, "Users", currentUser.uid));
         const userData = userDoc.data() as { defaultProjectLocation?: string } | undefined;
@@ -73,7 +73,6 @@ function NewProject() {
         setDefaultProjectLocation("");
       }
     };
-
     void loadDefaultProjectLocation();
   }, []);
 
@@ -87,11 +86,9 @@ function NewProject() {
   const mergeSelectedImages = (images: SelectedImage[]) => {
     setSelectedImages((currentImages) => {
       const imageMap = new Map(currentImages.map((image) => [image.path, image]));
-
       for (const image of images) {
         imageMap.set(image.path, image);
       }
-
       return Array.from(imageMap.values());
     });
   };
@@ -104,7 +101,6 @@ function NewProject() {
       .filter((file) => isImageFile(file.name))
       .map((file) => {
         const fileWithPath = file as File & { path?: string };
-
         return {
           path: fileWithPath.path ?? file.name,
           name: file.name,
@@ -122,28 +118,25 @@ function NewProject() {
       return;
     }
 
-    let reservedProjectDocRef: ReturnType<typeof doc> | null = null;
+    let reservedProjectDocRef: any = null;
 
     try {
       setIsCreating(true);
 
       const currentUser = auth.currentUser;
-      if (!currentUser) {
-        throw new Error("You must be logged in to create a project.");
-      }
+      if (!currentUser) throw new Error("You must be logged in.");
 
       const cleanedProjectName = projectName.trim();
       const projectId = generateProjectId();
       const projectNameKey = toProjectNameKey(cleanedProjectName);
       const projectDocRef = doc(db, "Users", currentUser.uid, "Projects", projectNameKey);
 
+      // 1. Reserve name in Firestore
       await runTransaction(db, async (transaction) => {
         const existingProjectWithSameName = await transaction.get(projectDocRef);
-
         if (existingProjectWithSameName.exists()) {
-          throw new Error("A project with this name already exists in your account.");
+          throw new Error("A project with this name already exists.");
         }
-
         transaction.set(projectDocRef, {
           projectId,
           uid: currentUser.uid,
@@ -154,12 +147,8 @@ function NewProject() {
           totalImageSizeBytes: selectedImageSize,
           projectPath: "",
           basePath: resolvedProjectLocation,
-          status: "Not Started",
-          processingOptions: {
-            generate3D,
-            generateOrtho,
-            generateNDVI,
-          },
+          status: "Processing", // Updated status since we launch immediately
+          processingOptions: { generate3D, generateOrtho, generateNDVI },
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
@@ -167,6 +156,7 @@ function NewProject() {
 
       reservedProjectDocRef = projectDocRef;
 
+      // 2. Create local folders and copy images via Electron
       const result = await window.electronAPI.createProject({
         projectId,
         projectName: cleanedProjectName,
@@ -175,34 +165,26 @@ function NewProject() {
         images: selectedImages,
       });
 
+      // 3. Update project path in Firestore
       await setDoc(projectDocRef, {
         projectPath: result.projectPath,
-        progress: 0,
         updatedAt: serverTimestamp(),
       }, { merge: true });
 
+      // 4. Cleanup and Navigate
       reservedProjectDocRef = null;
-
       await window.electronAPI.openExplorer(result.projectPath);
+      
       navigate(`/processing/${projectId}`, {
-        state: {
-          projectId,
-          projectName: cleanedProjectName,
-          imageCount: selectedImageCount,
-        },
+        state: { projectId, projectName: cleanedProjectName, imageCount: selectedImageCount },
       });
-    } catch (error) {
-      if (reservedProjectDocRef) {
-        try {
-          await deleteDoc(reservedProjectDocRef);
-        } catch {
-          // best effort cleanup when local project creation fails after reservation
-        }
-      }
 
+    } catch (error: any) {
+      if (reservedProjectDocRef) {
+        try { await deleteDoc(reservedProjectDocRef); } catch { /* ignore */ }
+      }
       console.error("Failed to create project", error);
-      const invalidPathError =
-        error instanceof Error && /project location|existing folder|not found/i.test(error.message);
+      const invalidPathError = /project location|folder|not found/i.test(error.message);
       setPathInvalid(invalidPathError);
       setCreateNudgeKey((currentKey) => currentKey + 1);
     } finally {
@@ -211,25 +193,16 @@ function NewProject() {
   };
 
   const handleBrowseProjectLocation = async () => {
-    try {
-      const selectedFolder = await window.electronAPI.selectFolder();
-
-      if (selectedFolder) {
-        setPathInvalid(false);
-        setProjectPath(selectedFolder);
-      }
-    } catch (error) {
-      console.error("Failed to select a project folder", error);
+    const selectedFolder = await window.electronAPI.selectFolder();
+    if (selectedFolder) {
+      setPathInvalid(false);
+      setProjectPath(selectedFolder);
     }
   };
 
   const handleBrowseImages = async () => {
-    try {
-      const images = await window.electronAPI.selectImages();
-      mergeSelectedImages(images);
-    } catch (error) {
-      console.error("Failed to select project images", error);
-    }
+    const images = await window.electronAPI.selectImages();
+    if (images && images.length > 0) mergeSelectedImages(images);
   };
 
   return (
@@ -248,9 +221,9 @@ function NewProject() {
 
       {/* Header */}
       <div className="px-8 py-6 border-b border-border">
-        <h1 className="text-2xl mb-2">Create New Project</h1>
+        <h1 className="text-2xl mb-2 font-semibold">Create New Project</h1>
         <p className="text-sm text-muted-foreground">
-          Set up a new photogrammetry project and configure processing options
+          Set up a new drone mapping project and start autonomous processing.
         </p>
       </div>
 
@@ -258,47 +231,31 @@ function NewProject() {
         <div className="max-w-3xl mx-auto">
           {/* Project Information */}
           <div className="bg-card border border-border rounded-lg p-6 mb-6">
-            <h2 className="text-base mb-4">Project Information</h2>
-            
+            <h2 className="text-base font-medium mb-4">Project Information</h2>
             <div className="space-y-4">
-              {/* Project Name */}
               <div>
-                <label className="block text-sm mb-2">Project Name</label>
+                <label className="block text-sm mb-2 font-medium">Project Name</label>
                 <input
                   type="text"
                   value={projectName}
                   onChange={(e) => setProjectName(e.target.value)}
-                  aria-invalid={validationAttempted && !isProjectNameValid}
-                  placeholder="Enter project name"
+                  placeholder="e.g. Corn Field Mapping"
                   className={`w-full px-4 py-2.5 bg-input border rounded-lg outline-none focus:ring-2 focus:ring-primary transition-all ${
-                    validationAttempted && !isProjectNameValid
-                      ? "border-red-500 ring-1 ring-red-500/50"
-                      : "border-border"
+                    validationAttempted && !isProjectNameValid ? "border-red-500 ring-1 ring-red-500/50" : "border-border"
                   }`}
                 />
               </div>
 
-              {/* Project Location */}
               <div>
-                <label className="block text-sm mb-2">Project Location (Optional)</label>
+                <label className="block text-sm mb-2 font-medium">Project Location</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={projectPath}
-                    onChange={(e) => {
-                      setPathInvalid(false);
-                      setProjectPath(e.target.value);
-                    }}
-                    aria-invalid={validationAttempted && !isProjectPathValid}
-                    placeholder={
-                      defaultProjectLocation
-                        ? `Default: ${defaultProjectLocation}`
-                        : "Select project folder"
-                    }
+                    onChange={(e) => { setPathInvalid(false); setProjectPath(e.target.value); }}
+                    placeholder={defaultProjectLocation || "Select storage folder"}
                     className={`flex-1 px-4 py-2.5 bg-input border rounded-lg outline-none focus:ring-2 focus:ring-primary transition-all ${
-                      validationAttempted && !isProjectPathValid
-                        ? "border-red-500 ring-1 ring-red-500/50"
-                        : "border-border"
+                      validationAttempted && !isProjectPathValid ? "border-red-500 ring-1 ring-red-500/50" : "border-border"
                     }`}
                   />
                   <button
@@ -310,31 +267,17 @@ function NewProject() {
                     Browse
                   </button>
                 </div>
-                {defaultProjectLocation && !projectPath.trim() && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Using default project location: {defaultProjectLocation}
-                  </p>
-                )}
-                {!defaultProjectLocation && !projectPath.trim() && (
-                  <p className="text-xs text-red-500 mt-2">
-                    Set a path here or configure a default project location in Settings.
-                  </p>
-                )}
               </div>
 
-              {/* Description */}
               <div>
-                <label className="block text-sm mb-2">Description</label>
+                <label className="block text-sm mb-2 font-medium">Description</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  aria-invalid={validationAttempted && !isDescriptionValid}
-                  placeholder="Enter project description"
+                  placeholder="Enter project details..."
                   rows={3}
                   className={`w-full px-4 py-2.5 bg-input border rounded-lg outline-none focus:ring-2 focus:ring-primary transition-all resize-none ${
-                    validationAttempted && !isDescriptionValid
-                      ? "border-red-500 ring-1 ring-red-500/50"
-                      : "border-border"
+                    validationAttempted && !isDescriptionValid ? "border-red-500 ring-1 ring-red-500/50" : "border-border"
                   }`}
                 />
               </div>
@@ -343,17 +286,11 @@ function NewProject() {
 
           {/* Image Import */}
           <div className="bg-card border border-border rounded-lg p-6 mb-6">
-            <h2 className="text-base mb-4">Import Images</h2>
-            
+            <h2 className="text-base font-medium mb-4">Drone Imagery</h2>
             <div
-              className={`
-                border-2 border-dashed rounded-lg p-8 text-center transition-all
-                ${
-                  dragActive
-                    ? "border-primary bg-primary/10"
-                    : "border-border hover:border-primary/50"
-                }
-              `}
+              className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
+                dragActive ? "border-primary bg-primary/10" : "border-border hover:border-primary/50"
+              }`}
               onDragEnter={() => setDragActive(true)}
               onDragLeave={() => setDragActive(false)}
               onDragOver={(e) => e.preventDefault()}
@@ -363,42 +300,34 @@ function NewProject() {
                 mergeSelectedImages(collectDroppedImages(e.dataTransfer.files));
               }}
             >
-              <div className="w-16 h-16 bg-accent rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Upload className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-base mb-2">Drag and drop images here</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Support for .JPG, .PNG, .TIFF formats
-              </p>
+              <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-base mb-2">Drag and drop drone images</h3>
+              <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, TIFF</p>
               <button
                 type="button"
                 onClick={handleBrowseImages}
-                className="px-6 py-2.5 bg-secondary hover:bg-accent border border-border rounded-lg transition-colors"
+                className="px-6 py-2.5 bg-secondary hover:bg-accent border border-border rounded-lg"
               >
                 Browse Files
               </button>
             </div>
 
-            <div className="mt-4 text-sm text-muted-foreground space-y-2">
-              <p>
-                {selectedImageCount} images selected
-                {selectedImageCount > 0 ? ` · ${formatFileSize(selectedImageSize)} total` : ""}
-              </p>
-              <p className={validationAttempted && !hasEnoughImages ? "text-red-500" : ""}>
-                Select at least 5 images
-              </p>
-
+            <div className="mt-4 text-sm space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="text-muted-foreground">
+                  {selectedImageCount} images · {formatFileSize(selectedImageSize)}
+                </span>
+                {validationAttempted && !hasEnoughImages && (
+                  <span className="text-red-500 text-xs">Need at least 5 images</span>
+                )}
+              </div>
+              
               {selectedImages.length > 0 && (
-                <div className="max-h-44 overflow-auto rounded-lg border border-border bg-input/40 p-3 space-y-2">
-                  {selectedImages.map((image) => (
-                    <div
-                      key={image.path}
-                      className="flex items-center justify-between gap-3 text-xs text-foreground"
-                    >
-                      <span className="truncate">{image.name}</span>
-                      <span className="shrink-0 text-muted-foreground">
-                        {formatFileSize(image.size)}
-                      </span>
+                <div className="max-h-32 overflow-auto rounded-lg border border-border bg-input/20 p-2">
+                  {selectedImages.map((img) => (
+                    <div key={img.path} className="flex justify-between text-[11px] py-1 border-b border-border/50 last:border-0">
+                      <span className="truncate max-w-[200px]">{img.name}</span>
+                      <span className="text-muted-foreground">{formatFileSize(img.size)}</span>
                     </div>
                   ))}
                 </div>
@@ -407,27 +336,26 @@ function NewProject() {
           </div>
 
           {/* Processing Options */}
-          <div className="bg-card border border-border rounded-lg p-6 mb-6">
-            <h2 className="text-base mb-4">Processing Options</h2>
-            
-            <div className="space-y-4">
+          <div className="bg-card border border-border rounded-lg p-6 mb-8">
+            <h2 className="text-base font-medium mb-4">Output Generation</h2>
+            <div className="grid grid-cols-1 gap-4">
               <ToggleOption
-                label="Generate 3D Model"
-                description="Create mesh and textured 3D model (.OBJ)"
+                label="3D Textured Mesh"
+                description="High-detail .OBJ and .PLY models"
                 checked={generate3D}
                 onChange={setGenerate3D}
                 invalid={validationAttempted && !hasAtLeastOneOption}
               />
               <ToggleOption
-                label="Generate Orthophoto"
-                description="Create georeferenced orthophoto map"
+                label="Orthophoto Map"
+                description="Georeferenced 2D aerial map (GeoTIFF)"
                 checked={generateOrtho}
                 onChange={setGenerateOrtho}
                 invalid={validationAttempted && !hasAtLeastOneOption}
               />
               <ToggleOption
-                label="Generate NDVI"
-                description="Generate vegetation index for multispectral images"
+                label="NDVI Index"
+                description="Vegetation health analysis (Multispectral)"
                 checked={generateNDVI}
                 onChange={setGenerateNDVI}
                 invalid={validationAttempted && !hasAtLeastOneOption}
@@ -435,8 +363,8 @@ function NewProject() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3">
+          {/* Action Footer */}
+          <div className="flex justify-end gap-3 pb-10">
             <button
               onClick={() => navigate("/")}
               className="px-6 py-2.5 bg-secondary hover:bg-accent border border-border rounded-lg transition-colors"
@@ -446,19 +374,13 @@ function NewProject() {
             <button
               onClick={handleCreateProject}
               disabled={isCreating}
-              className={`px-6 py-2.5 text-white rounded-lg transition-colors flex items-center gap-2 disabled:cursor-not-allowed ${
-                shouldShowCreateErrorAnimation
-                  ? "bg-red-600 hover:bg-red-500"
-                  : "bg-primary hover:bg-primary/90"
+              className={`px-8 py-2.5 text-white rounded-lg transition-all flex items-center gap-2 font-medium ${
+                shouldShowCreateErrorAnimation ? "bg-red-600" : "bg-primary hover:bg-primary/90"
               }`}
-              style={
-                shouldShowCreateErrorAnimation
-                  ? { animation: "projectCreateShake 0.45s ease-in-out 1" }
-                  : undefined
-              }
+              style={shouldShowCreateErrorAnimation ? { animation: "projectCreateShake 0.45s ease-in-out" } : undefined}
               key={createNudgeKey}
             >
-              {isCreating ? "Creating..." : "Create Project"}
+              {isCreating ? "Processing Files..." : "Start Project"}
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>

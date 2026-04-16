@@ -1,3 +1,4 @@
+// Styled text field used by the settings forms.
 interface TextInputProps {
   value: string;
   onChange: (value: string) => void;

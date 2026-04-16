@@ -4,7 +4,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "./Config/Firebase";
 
-// Hiarchy Components
+// Top-level shells for auth, the workspace, and the custom title bar.
 import LogInSignUp from "./Views/LogInView";
 import Layout from "./Views/Workspace";
 import TopNavBar from "./Views/TopNabBar";
@@ -18,6 +18,7 @@ const accentThemeConfig: Record<AccentTheme, { primary: string; ring: string }> 
   amber: { primary: "#f59e0b", ring: "#f59e0b" },
 };
 
+// Apply the chosen theme to global CSS variables and the dark-mode class.
 const applyAppearanceSettings = (mode: AppearanceMode, accentTheme: AccentTheme) => {
   document.documentElement.classList.toggle("dark", mode === "dark");
 
@@ -39,6 +40,7 @@ function App() {
   } | null>(null);
 
   useEffect(() => {
+    // Resolve auth and profile state before deciding which shell to render.
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
       if (user) {

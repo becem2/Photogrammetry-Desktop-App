@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-
+// Small summary card used across the dashboard metrics grid.
 function StatCard({
   icon: Icon,
   label,

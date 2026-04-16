@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { auth, db } from "../Config/Firebase";
 
+// Shared project model and derived labels used across the workspace views.
 export type ProjectStatus = "Not Started" | "Processing" | "Processed" | "Failed";
 
 export type UserProject = {
@@ -27,6 +28,7 @@ export type UserProject = {
 };
 
 const getDateFromFirestoreValue = (value: unknown): Date | null => {
+  // Convert Firestore timestamps when present.
   if (
     value &&
     typeof value === "object" &&
@@ -40,6 +42,7 @@ const getDateFromFirestoreValue = (value: unknown): Date | null => {
 };
 
 const normalizeStatus = (statusValue?: string): ProjectStatus => {
+  // Collapse backend status strings into the four UI states.
   const normalizedStatus = statusValue?.trim().toLowerCase();
 
   if (normalizedStatus === "processed" || normalizedStatus === "completed") {
@@ -58,6 +61,7 @@ const normalizeStatus = (statusValue?: string): ProjectStatus => {
 };
 
 const getProgressByStatus = (status: ProjectStatus, persistedProgress?: number) => {
+  // Fall back to a representative progress value when the document lacks one.
   if (typeof persistedProgress === "number") {
     return Math.min(100, Math.max(0, Math.round(persistedProgress)));
   }
@@ -137,6 +141,7 @@ const getLocationLabel = (basePath: string, projectPath: string) => {
 };
 
 export function useUserProjects() {
+  // Subscribe to the signed-in user's project collection and derive display fields.
   const [projects, setProjects] = useState<UserProject[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

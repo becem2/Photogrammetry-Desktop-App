@@ -7,6 +7,7 @@ import CheckYourEmailCard from "../Components/LogInView/CheckYourEmail";
 import LeftSide from "../Components/LogInView/LeftSide";
 import { User } from "firebase/auth";
 
+// Top-level login/sign-up screen that swaps between auth states and profile completion.
 interface LogInSignUpProps {
     onUserDataComplete: () => void;
     pendingProfileUser?: {

@@ -10,6 +10,7 @@ type RecentProject = {
   images: number;
 };
 
+// Compact dashboard card that links to the viewer or processing screen.
 function RecentProjectCard({ project }: { project: RecentProject }) {
   const statusColors = {
     Processed: "text-primary",

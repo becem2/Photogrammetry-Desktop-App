@@ -6,6 +6,7 @@ import { auth, facebookProvider, githubProvider, googleProvider, db } from '../.
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import { setDoc, doc } from "firebase/firestore";
 
+// Email/password sign-up form plus social sign-up shortcuts.
 function SignUpCard({ onSwitch, onSignUpSuccess }: { onSwitch: () => void; onSignUpSuccess: (email: string) => void; }) {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -54,7 +55,7 @@ function SignUpCard({ onSwitch, onSignUpSuccess }: { onSwitch: () => void; onSig
 
 
 
-    // Facebook popup
+    // Social sign-in helpers map each provider to the matching Firebase auth flow.
     const signInWithFacebook = async () => {
         try {
             await signInWithPopup(auth, facebookProvider);
@@ -63,8 +64,6 @@ function SignUpCard({ onSwitch, onSignUpSuccess }: { onSwitch: () => void; onSig
         }
     }
 
-
-    // Apple Popup
 
     const signInWithApple = async () => {
         try {
@@ -76,7 +75,6 @@ function SignUpCard({ onSwitch, onSignUpSuccess }: { onSwitch: () => void; onSig
 
 
 
-    // Github popup
     const signInWithGithub = async () => {
         try {
             await signInWithPopup(auth, githubProvider);
@@ -86,17 +84,12 @@ function SignUpCard({ onSwitch, onSignUpSuccess }: { onSwitch: () => void; onSig
     }
 
 
-    // Google Popup
-
     const signInWithGoogle = async () => {
         try {
-            // 1. Capture the result of the popup
             const result = await signInWithPopup(auth, googleProvider);
             
-            // 2. Get the email from the user object
             const userEmail = result.user.email;
 
-            // 3. Update the state (this will automatically fill the input field)
             if (userEmail) {
                 setEmail(userEmail);
             }

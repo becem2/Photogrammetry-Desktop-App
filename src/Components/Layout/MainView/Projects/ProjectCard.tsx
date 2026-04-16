@@ -4,6 +4,7 @@ import { AlertCircle, Clock, Eye, Image as ImageIcon, MapPin, Play, TrendingUp }
 import { type UserProject } from "../../../../hooks/useUserProjects";
 import ProjectMenu from "./ProjectMenu";
 
+// Card view used in the Projects gallery grid.
 const getProjectOpenPath = (project: UserProject) =>
   project.status === "Processed" ? `/viewer/${project.id}` : `/processing/${project.id}`;
 

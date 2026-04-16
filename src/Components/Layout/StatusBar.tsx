@@ -2,6 +2,7 @@ import { Activity, Cpu, Terminal } from "lucide-react";
 import * as Progress from "@radix-ui/react-progress";
 import { useSystemMetrics } from "../../hooks/useSystemMetrics";
 
+// Persistent footer bar that shows app readiness and system utilization.
 function StatusBar() {
   const { cpuUsage, gpuUsage } = useSystemMetrics();
 

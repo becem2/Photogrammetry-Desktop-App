@@ -1,5 +1,6 @@
 import type { ElementType, ReactNode } from "react";
 
+// Group of related settings rendered as a titled card.
 interface SettingSectionProps {
   icon: ElementType;
   title: string;

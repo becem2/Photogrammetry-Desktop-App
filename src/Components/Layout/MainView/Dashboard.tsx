@@ -22,6 +22,7 @@ import {
 import { useSystemMetrics } from "../../../hooks/useSystemMetrics";
 import { auth, db } from "../../../Config/Firebase";
 
+// Canonical project status values used by the dashboard summary and activity feed.
 type ProjectStatus = "Not Started" | "Processing" | "Processed" | "Failed";
 
 type DashboardProject = {
@@ -35,6 +36,7 @@ type DashboardProject = {
 };
 
 const getDateFromFirestoreValue = (value: unknown) => {
+  // Firestore timestamps expose toDate(); convert them when available.
   if (
     value &&
     typeof value === "object" &&
@@ -48,6 +50,7 @@ const getDateFromFirestoreValue = (value: unknown) => {
 };
 
 const normalizeStatus = (statusValue?: string): ProjectStatus => {
+  // Collapse backend status strings into the four UI states.
   const normalizedStatus = statusValue?.trim().toLowerCase();
 
   if (normalizedStatus === "processed" || normalizedStatus === "completed") {
@@ -66,6 +69,7 @@ const normalizeStatus = (statusValue?: string): ProjectStatus => {
 };
 
 const getProgressByStatus = (status: ProjectStatus, persistedProgress?: number) => {
+  // Favor stored progress, then fall back to a representative default.
   if (typeof persistedProgress === "number") {
     return Math.min(100, Math.max(0, Math.round(persistedProgress)));
   }
@@ -76,6 +80,7 @@ const getProgressByStatus = (status: ProjectStatus, persistedProgress?: number) 
 };
 
 const formatRelativeDate = (date?: Date) => {
+  // Compact relative-time labels for dashboard cards.
   if (!date) return "Just now";
 
   const diffMs = Date.now() - date.getTime();
@@ -101,12 +106,14 @@ const formatRelativeDate = (date?: Date) => {
 };
 
 function Dashboard() {
+  // Load the signed-in user's projects and present summary metrics.
   const [projects, setProjects] = useState<DashboardProject[]>([]);
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
   const [userFirstName, setUserFirstName] = useState("there");
   const { storagePercent, storageUsedGB, storageTotalGB, storageLabel } = useSystemMetrics();
 
   useEffect(() => {
+    // Keep the dashboard in sync with auth state and Firestore updates.
     let unsubscribeProjects: (() => void) | undefined;
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {

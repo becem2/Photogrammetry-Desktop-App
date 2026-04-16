@@ -3,6 +3,7 @@ import { User, Building2, Phone, Briefcase } from 'lucide-react';
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../Config/Firebase";
 
+// Profile completion form shown after sign-up or social login.
 interface AdditionalInfoCardProps {
     uid: string;
     email: string;

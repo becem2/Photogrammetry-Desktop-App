@@ -1,5 +1,6 @@
 import * as Switch from "@radix-ui/react-switch";
 
+// Reusable labeled toggle used by the new-project processing options.
 interface ToggleOptionProps {
   label: string;
   description: string;

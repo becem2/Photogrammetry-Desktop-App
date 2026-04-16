@@ -4,6 +4,7 @@ import { collection, getDocs, limit, query, where } from "firebase/firestore";
 import { Box, Download, FolderOpen, Image as ImageIcon } from "lucide-react";
 import { auth, db } from "../../../Config/Firebase";
 
+// Viewer screen that loads processed project outputs and offers download/preview links.
 type ViewerProjectData = {
     name?: string;
     projectPath?: string;

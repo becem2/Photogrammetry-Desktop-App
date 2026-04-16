@@ -1,5 +1,6 @@
 import * as Switch from "@radix-ui/react-switch";
 
+// Shared toggle switch primitive for settings rows.
 interface ToggleControlProps {
   checked: boolean;
   onCheckedChange: (value: boolean) => void;

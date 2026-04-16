@@ -1,6 +1,7 @@
 import { readdir, rm } from "node:fs/promises";
 import path from "node:path";
 
+// Remove older semver-named release folders while keeping the newest one.
 const RELEASE_DIR = path.resolve(process.cwd(), "release");
 const SEMVER_DIR = /^\d+\.\d+\.\d+$/;
 const KEEP_RELEASES = 1;

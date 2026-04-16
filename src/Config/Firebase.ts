@@ -1,12 +1,8 @@
-// Import the functions you need from the SDKs you need
+// Central Firebase bootstrap for auth and Firestore access.
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider, GithubAuthProvider, OAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Hard-coded config currently used by the app's Firebase project.
 const firebaseConfig = {
   apiKey: "AIzaSyBtOBq3HC-4AiDqPdCFprfxx1IzXgSVDQo",
   authDomain: "photogrammetry-app.firebaseapp.com",
@@ -17,7 +13,7 @@ const firebaseConfig = {
   measurementId: "G-BM6C9YZVZG"
 };
 
-// Initialize Firebase
+// Create the shared app, auth, database, and provider instances.
 const app = initializeApp(firebaseConfig);  
 export const auth = getAuth(app);
 export const db = getFirestore(app);

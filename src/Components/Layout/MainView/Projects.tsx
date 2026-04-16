@@ -9,10 +9,12 @@ import ProjectCard from "./Projects/ProjectCard";
 import ProjectListItem from "./Projects/ProjectListItem";
 import { type UserProject } from "../../../hooks/useUserProjects";
 
+// Tabs and sorting modes for the projects browser.
 type FilterTab = "all" | "active" | "completed" | "failed";
 type SortBy = "date" | "name" | "size" | "images";
 
 function Projects() {
+  // Manage the project gallery, search/filter controls, and delete flow.
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [filterTab, setFilterTab] = useState<FilterTab>("all");
   const [sortBy, setSortBy] = useState<SortBy>("date");
@@ -23,6 +25,7 @@ function Projects() {
   const { projects, isLoading } = useUserProjects();
 
   const handleRequestDeleteProject = (project: UserProject) => {
+    // Open the delete confirmation modal for a specific project.
     setDeleteError("");
     setProjectToDelete(project);
   };
@@ -34,6 +37,7 @@ function Projects() {
   };
 
   const handleConfirmDeleteProject = async () => {
+    // Remove the project record and optionally trash its local folder.
     if (!projectToDelete || isDeletingProject) return;
 
     const currentUser = auth.currentUser;

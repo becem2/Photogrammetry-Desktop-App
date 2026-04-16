@@ -1,6 +1,7 @@
 import { useState, type FormEvent, useRef, type KeyboardEvent } from "react";
 import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
 
+// Six-digit verification step shown after sign-up email confirmation.
 function EmailVerification({ onBack, onVerify, email }: { onBack: () => void, onVerify: (code: string) => void, email: string }) {
     const [code, setCode] = useState<string[]>(new Array(6).fill(""));
     const [isResending, setIsResending] = useState(false);
@@ -33,6 +34,7 @@ function EmailVerification({ onBack, onVerify, email }: { onBack: () => void, on
     };
 
     const handleResend = async () => {
+        // Placeholder resend action until the backend email flow is wired in.
         setIsResending(true);
         console.log("Resending code to:", email);
         setTimeout(() => setIsResending(false), 2000);

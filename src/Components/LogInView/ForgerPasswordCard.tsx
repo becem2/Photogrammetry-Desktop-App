@@ -1,6 +1,7 @@
 import { Mail, Key } from 'lucide-react';
 import { useState } from 'react';
 
+// Password reset request form that captures the target email address.
 interface ForgetPasswordCardProps {
     onBack: () => void;
     onEmailSubmitted: (email: string) => void;
@@ -13,7 +14,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setEmail(value);
-        // Simple email validation
+        // Lightweight client-side email check before enabling submission.
         setIsValidEmail(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
     };
 
@@ -25,7 +26,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
 
     return (
         <div className="bg-white rounded-2xl p-10 w-3/5 min-w-96 h-auto shadow-lg text-left border border-gray-300">
-            {/* Back Button */}
+            {/* Return to the login form. */}
             <div className="flex justify-start mb-5">
                 <button 
                     type="button"
@@ -40,9 +41,9 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                 </button>
             </div>
 
-            {/* Main Content */}
+            {/* Reset instructions and email field. */}
             <div className="flex flex-col items-center text-center">
-                {/* Green Icon Box */}
+                {/* Visual cue for password recovery. */}
                 <div className="bg-emerald-100 w-16 h-16 rounded-lg flex justify-center items-center mb-6">
                     <Key size={32} className="text-emerald-600" />
                 </div>
@@ -52,7 +53,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                     Enter your email address and we'll send you instructions to reset your password
                 </p>
 
-                {/* Email Input Field */}
+                {/* Email input used for the reset request. */}
                 <div className="w-full text-left mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
                     <div className="flex items-center border border-gray-300 rounded-lg px-3 py-2 bg-white transition-all duration-200 focus-within:border-emerald-600 focus-within:ring-2 focus-within:ring-emerald-600 focus-within:ring-inset">
@@ -67,7 +68,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                     </div>
                 </div>
 
-                {/* Primary Action Button */}
+                {/* Submit the password reset request. */}
                 <button 
                     onClick={handleSubmit}
                     disabled={!isValidEmail}
@@ -76,7 +77,7 @@ function ForgetPasswordCard({ onBack, onEmailSubmitted }: ForgetPasswordCardProp
                     Send Reset Instructions
                 </button>
 
-                {/* Help Footer Box */}
+                {/* Support contact fallback. */}
                 <div className="w-full bg-gray-100 rounded-lg p-4 mt-6">
                     <p className="m-0 text-sm text-gray-600 font-medium">
                         Need help? Contact support at{' '}

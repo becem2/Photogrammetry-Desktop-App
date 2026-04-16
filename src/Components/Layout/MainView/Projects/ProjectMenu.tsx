@@ -3,6 +3,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Copy, Download, Eye, FileText, Share2, Trash2, MoreVertical } from "lucide-react";
 import { type UserProject } from "../../../../hooks/useUserProjects";
 
+// Context menu for project-level actions.
 const getProjectOpenPath = (project: UserProject) =>
   project.status === "Processed" ? `/viewer/${project.id}` : `/processing/${project.id}`;
 

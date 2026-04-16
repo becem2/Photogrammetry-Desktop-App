@@ -19,6 +19,7 @@ interface LogInCardProps {
 }
 
 
+// Login form with email/password and social sign-in options.
 
 function LogInCard({ onSignUp, onForgot }: LogInCardProps) {
     const [showPassword, setShowPassword] = useState(false);
@@ -49,6 +50,7 @@ function LogInCard({ onSignUp, onForgot }: LogInCardProps) {
         try {
             await setAuthPersistenceByRememberChoice();
 
+            // Google uses the Electron external popup so the OAuth callback can complete securely.
             if (provider.providerId === googleProvider.providerId) {
                 const googleAuthResult = await window.electronAPI.signInWithGoogleExternal();
                 const googleCredential = GoogleAuthProvider.credential(
