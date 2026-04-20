@@ -63,6 +63,41 @@ const electronAPI = {
     throw new Error("Unexpected payload while reading PLY file.");
   },
 
+  readFileBinary: async (filePath: string): Promise<ArrayBuffer> => {
+    const payload = await ipcRenderer.invoke("read-file-binary", filePath);
+
+    if (payload instanceof ArrayBuffer) {
+      return payload;
+    }
+
+    if (ArrayBuffer.isView(payload)) {
+      const view = payload as Uint8Array;
+      const bytes = new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
+      return bytes.slice().buffer;
+    }
+
+    if (Array.isArray(payload)) {
+      return Uint8Array.from(payload).buffer;
+    }
+
+    if (
+      payload &&
+      typeof payload === "object" &&
+      "type" in payload &&
+      "data" in payload &&
+      (payload as { type?: unknown }).type === "Buffer" &&
+      Array.isArray((payload as { data?: unknown }).data)
+    ) {
+      return Uint8Array.from((payload as { data: number[] }).data).buffer;
+    }
+
+    throw new Error("Unexpected payload while reading file as binary.");
+  },
+
+  readFileText: (filePath: string): Promise<string> => {
+    return ipcRenderer.invoke("read-file-text", filePath);
+  },
+
   saveScreenshot: (payload: { filePath: string; dataUrl: string }) => {
     return ipcRenderer.invoke("save-screenshot", payload);
   },

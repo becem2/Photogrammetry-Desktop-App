@@ -30,6 +30,8 @@ interface Window {
     selectImages: () => Promise<Array<{ path: string; name: string; size: number }>>
     openPlyFile: () => Promise<string | null>
     readPlyFile: (filePath: string) => Promise<ArrayBuffer>
+    readFileBinary: (filePath: string) => Promise<ArrayBuffer>
+    readFileText: (filePath: string) => Promise<string>
     saveScreenshot: (payload: { filePath: string; dataUrl: string }) => Promise<void>
     createProject: (payload: {
       projectId: string

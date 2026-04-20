@@ -296,6 +296,17 @@ ipcMain.handle("read-ply-file", async (_event, filePath: string) => {
   return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
 });
 
+ipcMain.handle("read-file-binary", async (_event, filePath: string) => {
+  const normalizedPath = path.normalize(filePath);
+  const data = await fs.promises.readFile(normalizedPath);
+  return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+});
+
+ipcMain.handle("read-file-text", async (_event, filePath: string) => {
+  const normalizedPath = path.normalize(filePath);
+  return fs.promises.readFile(normalizedPath, "utf8");
+});
+
 ipcMain.handle("save-screenshot", async (_event, payload: { filePath: string; dataUrl: string }) => {
   const screenshotFolder = path.dirname(payload.filePath);
   const normalizedFolder = path.normalize(screenshotFolder);
