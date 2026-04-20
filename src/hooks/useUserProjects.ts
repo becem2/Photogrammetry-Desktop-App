@@ -17,6 +17,8 @@ export type UserProject = {
   totalImageSizeBytes: number;
   projectPath: string;
   basePath: string;
+  iconPath: string;
+  iconUrl: string;
   createdAt: Date | null;
   updatedAt: Date | null;
   createdAtMs: number;
@@ -25,6 +27,17 @@ export type UserProject = {
   locationLabel: string;
   progress: number;
   typeLabel: string;
+};
+
+const toFileAssetUrl = (value: string) => {
+  if (!value) return "";
+
+  if (/^(https?:|data:|file:)/i.test(value)) {
+    return value;
+  }
+
+  const normalizedPath = value.replace(/\\/g, "/").replace(/^\/+/, "");
+  return encodeURI(`file:///${normalizedPath}`);
 };
 
 const getDateFromFirestoreValue = (value: unknown): Date | null => {
@@ -178,6 +191,7 @@ export function useUserProjects() {
               totalImageSizeBytes?: number;
               projectPath?: string;
               basePath?: string;
+              projectIconPath?: string;
               createdAt?: unknown;
               updatedAt?: unknown;
               processingOptions?: {
@@ -196,6 +210,7 @@ export function useUserProjects() {
               typeof projectData.totalImageSizeBytes === "number" ? projectData.totalImageSizeBytes : 0;
             const projectPath = typeof projectData.projectPath === "string" ? projectData.projectPath : "";
             const basePath = typeof projectData.basePath === "string" ? projectData.basePath : "";
+            const iconPath = typeof projectData.projectIconPath === "string" ? projectData.projectIconPath : "";
 
             return {
               documentId: projectDoc.id,
@@ -208,6 +223,8 @@ export function useUserProjects() {
               totalImageSizeBytes,
               projectPath,
               basePath,
+              iconPath,
+              iconUrl: toFileAssetUrl(iconPath),
               createdAt,
               updatedAt,
               createdAtMs: createdAt?.getTime() ?? 0,

@@ -26,6 +26,47 @@ const electronAPI = {
     return ipcRenderer.invoke("select-images");
   },
 
+  openPlyFile: () => {
+    // Open the native PLY picker.
+    return ipcRenderer.invoke("open-ply-file");
+  },
+
+  readPlyFile: async (filePath: string): Promise<ArrayBuffer> => {
+    // Read raw binary bytes for PLY parsing in renderer.
+    const payload = await ipcRenderer.invoke("read-ply-file", filePath);
+
+    if (payload instanceof ArrayBuffer) {
+      return payload;
+    }
+
+    if (ArrayBuffer.isView(payload)) {
+      const view = payload as Uint8Array;
+      const bytes = new Uint8Array(view.buffer, view.byteOffset, view.byteLength);
+      return bytes.slice().buffer;
+    }
+
+    if (Array.isArray(payload)) {
+      return Uint8Array.from(payload).buffer;
+    }
+
+    if (
+      payload &&
+      typeof payload === "object" &&
+      "type" in payload &&
+      "data" in payload &&
+      (payload as { type?: unknown }).type === "Buffer" &&
+      Array.isArray((payload as { data?: unknown }).data)
+    ) {
+      return Uint8Array.from((payload as { data: number[] }).data).buffer;
+    }
+
+    throw new Error("Unexpected payload while reading PLY file.");
+  },
+
+  saveScreenshot: (payload: { filePath: string; dataUrl: string }) => {
+    return ipcRenderer.invoke("save-screenshot", payload);
+  },
+
   createProject: (payload: {
     projectId: string;
     projectName: string;
@@ -76,4 +117,4 @@ const electronAPI = {
 };
 
 // Publish the safe API on window.electronAPI.
-contextBridge.exposeInMainWorld("electronAPI", electronAPI);
+contextBridge.exposeInMainWorld("electronAPI", electronAPI);``

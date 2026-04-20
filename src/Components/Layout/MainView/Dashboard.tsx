@@ -32,7 +32,19 @@ type DashboardProject = {
   progress: number;
   date: string;
   images: number;
+  iconUrl: string;
   createdAtMs: number;
+};
+
+const toFileAssetUrl = (value: string) => {
+  if (!value) return "";
+
+  if (/^(https?:|data:|file:)/i.test(value)) {
+    return value;
+  }
+
+  const normalizedPath = value.replace(/\\/g, "/").replace(/^\/+/, "");
+  return encodeURI(`file:///${normalizedPath}`);
 };
 
 const getDateFromFirestoreValue = (value: unknown) => {
@@ -152,6 +164,7 @@ function Dashboard() {
               status?: string;
               progress?: number;
               imageCount?: number;
+              projectIconPath?: string;
               createdAt?: unknown;
             };
 
@@ -169,6 +182,7 @@ function Dashboard() {
               progress: getProgressByStatus(status, progress),
               date: formatRelativeDate(createdAtDate),
               images: typeof projectData.imageCount === "number" ? projectData.imageCount : 0,
+              iconUrl: toFileAssetUrl(typeof projectData.projectIconPath === "string" ? projectData.projectIconPath : ""),
               createdAtMs: createdAtDate?.getTime() ?? 0,
             } satisfies DashboardProject;
           });

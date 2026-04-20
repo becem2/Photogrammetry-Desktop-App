@@ -13,6 +13,20 @@ function Sidebar() {
   // Highlight the active route and show tooltips for each destination.
   const location = useLocation();
 
+  const getActiveNavPath = (pathname: string) => {
+    if (pathname.startsWith("/viewer")) {
+      return "/viewer";
+    }
+
+    if (pathname === "/newproject" || pathname === "/openproject") {
+      return "/projects";
+    }
+
+    return pathname;
+  };
+
+  const activeNavPath = getActiveNavPath(location.pathname);
+
   const navItems: NavItem[] = [
     { path: "/", label: "Dashboard", icon: Home },
     { path: "/projects", label: "Projects", icon: FolderOpen },
@@ -24,7 +38,7 @@ function Sidebar() {
     <Tooltip.Provider delayDuration={200}>
       <aside className="w-16 bg-sidebar border-r border-sidebar-border flex flex-col items-center py-4 gap-2">
         {navItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = activeNavPath === item.path;
           const Icon = item.icon;
 
           return (

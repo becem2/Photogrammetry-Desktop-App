@@ -8,6 +8,7 @@ type RecentProject = {
   progress: number;
   date: string;
   images: number;
+  iconUrl: string;
 };
 
 // Compact dashboard card that links to the viewer or processing screen.
@@ -27,6 +28,18 @@ function RecentProjectCard({ project }: { project: RecentProject }) {
         <div className="flex gap-4">
           {/* Thumbnail */}
           <div className="w-48 h-32 bg-secondary relative overflow-hidden shrink-0">
+            {project.iconUrl && (
+              <img
+                src={project.iconUrl}
+                alt={`${project.name} icon`}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!project.iconUrl && (
+              <div className="absolute inset-0 bg-linear-to-br from-secondary via-accent to-secondary flex items-center justify-center text-muted-foreground">
+                <ImageIcon className="w-7 h-7" />
+              </div>
+            )}
             {project.progress < 100 && (
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                 <div

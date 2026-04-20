@@ -30,6 +30,19 @@ function ProjectCard({
       className="bg-card border-2 border-border rounded-xl overflow-hidden hover:border-primary/50 hover:shadow-2xl transition-all group"
     >
       <div className="aspect-video bg-secondary relative overflow-hidden">
+        {project.iconUrl && (
+          <img
+            src={project.iconUrl}
+            alt={`${project.name} icon`}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+        {!project.iconUrl && (
+          <div className="absolute inset-0 bg-linear-to-br from-secondary via-accent to-secondary flex flex-col items-center justify-center gap-2 text-muted-foreground">
+            <ImageIcon className="w-8 h-8" />
+            <span className="text-xs">Preparing preview...</span>
+          </div>
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
         <div className={`absolute top-3 right-3 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-semibold backdrop-blur-md ${config.bg} ${config.text}`}>

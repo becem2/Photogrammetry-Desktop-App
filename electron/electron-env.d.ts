@@ -28,6 +28,9 @@ interface Window {
     readDirectory: (dirPath: string) => Promise<unknown>
     selectFolder: () => Promise<string | null>
     selectImages: () => Promise<Array<{ path: string; name: string; size: number }>>
+    openPlyFile: () => Promise<string | null>
+    readPlyFile: (filePath: string) => Promise<ArrayBuffer>
+    saveScreenshot: (payload: { filePath: string; dataUrl: string }) => Promise<void>
     createProject: (payload: {
       projectId: string
       projectName: string

@@ -281,6 +281,33 @@ ipcMain.handle("select-images", async () => {
   }));
 });
 
+ipcMain.handle("open-ply-file", async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openFile"],
+    filters: [{ name: "PLY", extensions: ["ply"] }],
+  });
+
+  return result.canceled ? null : result.filePaths[0];
+});
+
+ipcMain.handle("read-ply-file", async (_event, filePath: string) => {
+  const normalizedPath = path.normalize(filePath);
+  const data = await fs.promises.readFile(normalizedPath);
+  return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+});
+
+ipcMain.handle("save-screenshot", async (_event, payload: { filePath: string; dataUrl: string }) => {
+  const screenshotFolder = path.dirname(payload.filePath);
+  const normalizedFolder = path.normalize(screenshotFolder);
+  await fs.promises.mkdir(normalizedFolder, { recursive: true });
+
+  const base64Data = payload.dataUrl.replace(/^data:image\/png;base64,/, "");
+  const fileBuffer = Buffer.from(base64Data, "base64");
+  await fs.promises.writeFile(path.normalize(payload.filePath), fileBuffer);
+
+  return { saved: true, filePath: path.normalize(payload.filePath) };
+});
+
 ipcMain.handle("create-project", async (_event, payload: CreateProjectPayload) => {
   const projectRoot = path.join(payload.projectLocation, sanitizeFolderName(payload.projectName));
   const imagesFolder = path.join(projectRoot, "images");

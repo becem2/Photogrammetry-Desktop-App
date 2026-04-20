@@ -33,6 +33,18 @@ function ProjectListItem({
       >
         <div className="flex items-center gap-4">
           <div className="w-32 h-20 bg-secondary rounded-lg overflow-hidden shrink-0 relative">
+            {project.iconUrl && (
+              <img
+                src={project.iconUrl}
+                alt={`${project.name} icon`}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {!project.iconUrl && (
+              <div className="absolute inset-0 bg-linear-to-br from-secondary via-accent to-secondary flex items-center justify-center text-muted-foreground">
+                <ImageIcon className="w-5 h-5" />
+              </div>
+            )}
             {project.progress > 0 && project.progress < 100 && (
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/40">
                 <div className="h-full bg-primary" style={{ width: `${project.progress}%` }} />

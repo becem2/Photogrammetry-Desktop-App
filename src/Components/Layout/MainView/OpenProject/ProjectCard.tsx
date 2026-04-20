@@ -38,6 +38,18 @@ function ProjectCard({ project, onOpen }: ProjectCardProps) {
   return (
     <div className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all group">
       <div className="aspect-video bg-secondary relative overflow-hidden cursor-pointer" onClick={onOpen}>
+        {project.iconUrl && (
+          <img
+            src={project.iconUrl}
+            alt={`${project.name} icon`}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        )}
+        {!project.iconUrl && (
+          <div className="absolute inset-0 bg-linear-to-br from-secondary via-accent to-secondary flex items-center justify-center text-muted-foreground">
+            <ImageIcon className="w-7 h-7" />
+          </div>
+        )}
         <div
           className={`absolute top-3 right-3 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 text-xs font-medium ${getStatusColor(
             project.status
