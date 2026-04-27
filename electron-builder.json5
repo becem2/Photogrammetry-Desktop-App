@@ -22,11 +22,18 @@
       {
         "target": "nsis",
         "arch": [
+          "x64",
+          "ia32"
+        ]
+      },
+      {
+        "target": "portable",
+        "arch": [
           "x64"
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-Windows-${version}-${arch}.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -36,8 +43,11 @@
   },
   "linux": {
     "target": [
-      "AppImage"
+      "AppImage",
+      "deb",
+      "rpm"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "category": "Utility",
+    "artifactName": "${productName}-Linux-${version}-${arch}.${ext}"
   }
 }

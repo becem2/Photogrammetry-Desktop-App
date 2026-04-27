@@ -7,7 +7,11 @@
   "description": "This is a professional photogrammetry Software",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder --publish=never",
+    "build:all": "npm run build -- --win --linux",
+    "build:win": "tsc && vite build && electron-builder --win --publish=never",
+    "build:linux": "tsc && vite build && electron-builder --linux --publish=never",
+    "build:win-linux": "npm run build:win && npm run build:linux",
     "clean:releases": "node scripts/clean-old-releases.mjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
